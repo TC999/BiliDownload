@@ -24,7 +24,7 @@ annotation class UiIntentObserver(val cla: KClass<*>)
 
 abstract class CoreCompViewModel<I : Any, S>(initStatus: S) : ViewModel() {
     // Ui State (Model -> View)
-    protected val mUiStateFlow = MutableStateFlow(initStatus)
+    private val mUiStateFlow = MutableStateFlow(initStatus)
     val uiStateFlow = mUiStateFlow.asStateFlow()
 
     // Ui Intent (View -> Model)
@@ -68,7 +68,7 @@ abstract class CoreCompViewModel<I : Any, S>(initStatus: S) : ViewModel() {
      * 接收到ui意图并处理
      */
     private fun onReceivedUiIntent(uiIntent: I) {
-        val clazz = uiIntent::class
+        val clazz = (uiIntent ?: return)::class
         val observers = mUiIntentObserverMap[clazz] ?: return
         for (func in observers) {
             when (val size = func.parameters.size) {
@@ -87,10 +87,15 @@ abstract class CoreCompViewModel<I : Any, S>(initStatus: S) : ViewModel() {
     }
 
     /**
+     * 立即获取当前UiState
+     */
+    protected fun fetchUiState() = mUiStateFlow.value
+
+    /**
      * 等待uiState变更为指定状态类型后返回
      */
-    protected suspend inline fun <reified T : S> awaitUiStateOfType(): T {
-        return mUiStateFlow.filterIsInstance<T>().first()
+    protected suspend inline fun <reified T> awaitUiStateOfType(): T {
+        return uiStateFlow.filterIsInstance<T>().first()
     }
 
     /**
