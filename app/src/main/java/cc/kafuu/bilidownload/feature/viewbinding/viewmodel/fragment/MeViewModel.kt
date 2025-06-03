@@ -10,7 +10,7 @@ import cc.kafuu.bilidownload.common.manager.AccountManager
 import cc.kafuu.bilidownload.common.model.TaskStatus
 import cc.kafuu.bilidownload.common.network.NetworkConfig
 import cc.kafuu.bilidownload.common.room.repository.DownloadRepository
-import cc.kafuu.bilidownload.feature.viewbinding.view.activity.LoginActivity
+import cc.kafuu.bilidownload.feature.compose.activity.QrLoginActivity
 import cc.kafuu.bilidownload.feature.viewbinding.view.activity.PersonalDetailsActivity
 import cc.kafuu.bilidownload.feature.viewbinding.view.dialog.ConfirmDialog
 import kotlinx.coroutines.launch
@@ -21,7 +21,8 @@ class MeViewModel : CoreViewModel() {
 
     fun jumpLoginOrAccount() {
         val accountData = AccountManager.accountLiveData.value ?: kotlin.run {
-            startActivity(LoginActivity::class.java)
+            // TODO: 暂时替代为二维码登录
+            startActivity(QrLoginActivity::class.java)
             return
         }
         startActivity(

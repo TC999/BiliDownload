@@ -18,6 +18,11 @@ android {
         versionName = "2.2.1.foss"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                cppFlags += ""
+            }
+        }
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -69,6 +74,12 @@ android {
             )
         }
     }
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
 }
 
 extra.set(
@@ -84,8 +95,6 @@ dependencies {
     file("libs").listFiles { file -> file.extension == "aar" }?.forEach { aarFile ->
         implementation(files(aarFile))
     }
-
-
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity)
