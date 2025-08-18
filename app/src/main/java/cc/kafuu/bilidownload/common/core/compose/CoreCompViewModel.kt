@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
@@ -22,7 +23,7 @@ import kotlin.reflect.jvm.isAccessible
 @Retention(AnnotationRetention.RUNTIME)
 annotation class UiIntentObserver(val cla: KClass<*>)
 
-abstract class CoreCompViewModel<I : Any, S>(initStatus: S) : ViewModel() {
+abstract class CoreCompViewModel<I, S>(initStatus: S) : ViewModel() {
     // Ui State (Model -> View)
     private val mUiStateFlow = MutableStateFlow(initStatus)
     val uiStateFlow = mUiStateFlow.asStateFlow()
@@ -87,15 +88,26 @@ abstract class CoreCompViewModel<I : Any, S>(initStatus: S) : ViewModel() {
     }
 
     /**
-     * 立即获取当前UiState
+     * 获取指定类型UiState
      */
-    protected fun fetchUiState() = mUiStateFlow.value
+    protected inline fun <reified T : S> getOrNull(): T? = uiStateFlow.value as? T
+
+    /**
+     * 判断当前State类型
+     */
+    protected inline fun <reified T : S> isStateOf() = uiStateFlow.value is T
 
     /**
      * 等待uiState变更为指定状态类型后返回
      */
-    protected suspend inline fun <reified T> awaitUiStateOfType(): T {
+    protected suspend inline fun <reified T> awaitStateOf(): T {
         return uiStateFlow.filterIsInstance<T>().first()
+    }
+
+    protected suspend inline fun <reified T> awaitStateOf(
+        crossinline predicate: suspend (T) -> Boolean
+    ): T {
+        return uiStateFlow.filterIsInstance<T>().filter(predicate).first()
     }
 
     /**
