@@ -10,7 +10,7 @@
 
 struct QRCodeMatrix {
     uint32_t size = 0;
-    std::vector<bool> matrix;
+    std::vector<uint8_t> matrix;
 };
 
 QRCodeMatrix GeneralQrCode(const std::string &text);

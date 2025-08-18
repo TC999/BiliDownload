@@ -19,7 +19,7 @@ QRCodeMatrix GeneralQrCode(const std::string &text) {
     uint32_t size = qrcode->width;
     if (size == 0) return {};
     // 制取二维码矩阵
-    std::vector<bool> matrix(size * size, false);
+    std::vector<uint8_t> matrix(size * size, false);
     for (size_t i = 0; i < matrix.size(); ++i) {
         matrix[i] = (qrcode->data[i] & 0x1) != 0;
     }
