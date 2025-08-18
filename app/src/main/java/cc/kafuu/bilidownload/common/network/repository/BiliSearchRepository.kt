@@ -99,7 +99,9 @@ class BiliSearchRepository(private val biliApiService: BiliApiService) : BiliRep
         page: Int,
         callback: IServerCallback<BiliSearchData<BiliSearchVideoResultData>>
     ) = requestNormalSearchWbi(SEARCH_TYPE_VIDEO, keyword, page, callback) { _, _, _, data ->
-        biliApiService.requestSearchVideo(getNormalSearchFullUrl(data)).enqueue(callback) { it }
+        biliApiService
+            .requestSearchVideo(getNormalSearchFullUrl(data))
+            .enqueue(callback) { _, data -> data }
     }
 
     /**
@@ -115,7 +117,9 @@ class BiliSearchRepository(private val biliApiService: BiliApiService) : BiliRep
         page,
         callback
     ) { _, _, _, data ->
-        biliApiService.requestSearchMedia(getNormalSearchFullUrl(data)).enqueue(callback) { it }
+        biliApiService
+            .requestSearchMedia(getNormalSearchFullUrl(data))
+            .enqueue(callback) { _, data -> data }
     }
 
     /**
@@ -126,7 +130,9 @@ class BiliSearchRepository(private val biliApiService: BiliApiService) : BiliRep
         page: Int,
         callback: IServerCallback<BiliSearchData<BiliSearchMediaResultData>>
     ) = requestNormalSearchWbi(SEARCH_TYPE_MEDIA_FT, keyword, page, callback) { _, _, _, data ->
-        biliApiService.requestSearchMedia(getNormalSearchFullUrl(data)).enqueue(callback) { it }
+        biliApiService
+            .requestSearchMedia(getNormalSearchFullUrl(data))
+            .enqueue(callback) { _, data -> data }
     }
 
     /**
@@ -147,8 +153,8 @@ class BiliSearchRepository(private val biliApiService: BiliApiService) : BiliRep
         ps: Int = 30,
         callback: IServerCallback<BiliSearchManuscriptData>,
     ) = requestSpaceSearchWbi(mid, order, tid, keyword, pn, ps, callback) { _, _, _, data ->
-        biliApiService.requestSearchManuscript(getSpaceSearchFullUrl(data)).run {
-            enqueue(callback) { it }
-        }
+        biliApiService
+            .requestSearchManuscript(getSpaceSearchFullUrl(data))
+            .enqueue(callback) { _, data -> data }
     }
 }

@@ -27,22 +27,26 @@ class BiliRiskControlRepository(
     @Throws(IOException::class, IllegalStateException::class)
     fun syncRequestWbiKey(onFailure: ((Int, Int, String) -> Unit)? = null): Pair<String, String>? {
         //Wbi接口相对特殊，就算respond code非0也存在wbi，因此无需检查respond code
-        return biliApiService.requestWbiInterfaceNav().execute(onFailure, false) {
-            Pair(
-                it.wbiImg.imgUrl.extractBetweenWbiAndDot(),
-                it.wbiImg.subUrl.extractBetweenWbiAndDot()
-            )
-        }
+        return biliApiService
+            .requestWbiInterfaceNav()
+            .execute(onFailure, false) { _, data ->
+                Pair(
+                    data.wbiImg.imgUrl.extractBetweenWbiAndDot(),
+                    data.wbiImg.subUrl.extractBetweenWbiAndDot()
+                )
+            }
     }
 
     fun requestWbiKey(callback: IServerCallback<Pair<String, String>>) {
         //Wbi接口相对特殊，就算respond code非0也存在wbi，因此无需检查respond code
-        biliApiService.requestWbiInterfaceNav().enqueue(callback, false) {
-            Pair(
-                it.wbiImg.imgUrl.extractBetweenWbiAndDot(),
-                it.wbiImg.subUrl.extractBetweenWbiAndDot()
-            )
-        }
+        biliApiService
+            .requestWbiInterfaceNav()
+            .enqueue(callback, false) { _, data ->
+                Pair(
+                    data.wbiImg.imgUrl.extractBetweenWbiAndDot(),
+                    data.wbiImg.subUrl.extractBetweenWbiAndDot()
+                )
+            }
     }
 
     fun requestUserAccessId(mid: Long, callback: IServerCallback<String>) {

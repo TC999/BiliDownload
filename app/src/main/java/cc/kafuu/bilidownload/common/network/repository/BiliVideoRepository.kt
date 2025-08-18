@@ -26,9 +26,9 @@ class BiliVideoRepository(private val biliApiService: BiliApiService) : BiliRepo
         cid: Long,
         callback: IServerCallback<BiliPlayStreamDash>
     ) {
-        biliApiService.requestPlayStream(null, bvid, cid, null, FNVAL_FLAGS).enqueue(callback) {
-            it.dash
-        }
+        biliApiService
+            .requestPlayStream(null, bvid, cid, null, FNVAL_FLAGS)
+            .enqueue(callback) { _, data -> data.dash }
     }
 
     fun requestPlayStreamData(
@@ -36,34 +36,47 @@ class BiliVideoRepository(private val biliApiService: BiliApiService) : BiliRepo
         cid: Long,
         callback: IServerCallback<BiliPlayStreamData>
     ) {
-        biliApiService.requestPlayStream(null, bvid, cid, null, FNVAL_FLAGS)
-            .enqueue(callback) { it }
+        biliApiService
+            .requestPlayStream(null, bvid, cid, null, FNVAL_FLAGS)
+            .enqueue(callback) { _, data -> data }
     }
 
     fun requestVideoDetail(bvid: String, callback: IServerCallback<BiliVideoData>) {
-        biliApiService.requestVideoDetail(null, bvid).enqueue(callback) { it }
+        biliApiService
+            .requestVideoDetail(null, bvid)
+            .enqueue(callback) { _, data -> data }
     }
 
     fun syncRequestVideoDetail(
         bvid: String,
         onFailure: ((Int, Int, String) -> Unit)? = null
-    ) = biliApiService.requestVideoDetail(null, bvid).execute(onFailure) { it }
+    ) = biliApiService
+        .requestVideoDetail(null, bvid)
+        .execute(onFailure) { _, data -> data }
 
     fun requestSeasonDetailBySeasonId(seasonId: Long, callback: IServerCallback<BiliSeasonData>) {
-        biliApiService.requestSeasonDetail(seasonId, null).enqueue(callback) { it }
+        biliApiService
+            .requestSeasonDetail(seasonId, null)
+            .enqueue(callback) { _, data -> data }
     }
 
     fun syncRequestSeasonDetailBySeasonId(
         seasonId: Long,
         onFailure: ((Int, Int, String) -> Unit)? = null
-    ) = biliApiService.requestSeasonDetail(seasonId, null).execute(onFailure) { it }
+    ) = biliApiService
+        .requestSeasonDetail(seasonId, null)
+        .execute(onFailure) { _, data -> data }
 
     fun requestSeasonDetailByEpId(epId: Long, callback: IServerCallback<BiliSeasonData>) {
-        biliApiService.requestSeasonDetail(null, epId).enqueue(callback) { it }
+        biliApiService
+            .requestSeasonDetail(null, epId)
+            .enqueue(callback) { _, data -> data }
     }
 
     fun syncRequestSeasonDetailByEpId(
         epId: Long,
         onFailure: ((Int, Int, String) -> Unit)? = null
-    ) = biliApiService.requestSeasonDetail(null, epId).execute(onFailure) { it }
+    ) = biliApiService
+        .requestSeasonDetail(null, epId)
+        .execute(onFailure) { _, data -> data }
 }

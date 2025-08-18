@@ -26,7 +26,7 @@ open class BiliRepository {
     protected fun <T, D> Call<BiliRespond<T>>.enqueue(
         callback: IServerCallback<D>,
         checkResponseCode: Boolean,
-        processingData: (T) -> D
+        processingData: (Response<BiliRespond<T>>, T) -> D
     ) = enqueue(object : Callback<BiliRespond<T>> {
         override fun onResponse(
             call: Call<BiliRespond<T>>,
@@ -52,7 +52,7 @@ open class BiliRepository {
 
     protected fun <T, D> Call<BiliRespond<T>>.enqueue(
         callback: IServerCallback<D>,
-        processingData: (T) -> D
+        processingData: (Response<BiliRespond<T>>, T) -> D
     ) = enqueue(callback, true, processingData)
 
 
@@ -74,7 +74,7 @@ open class BiliRepository {
     protected fun <T, D> Call<BiliRespond<T>>.execute(
         onFailure: ((Int, Int, String) -> Unit)?,
         checkResponseCode: Boolean,
-        processingData: (T) -> D
+        processingData: (Response<BiliRespond<T>>, T) -> D
     ): D? = try {
         val response = execute()
         var result: D? = null
@@ -91,7 +91,7 @@ open class BiliRepository {
     @Throws(IOException::class, IllegalStateException::class)
     protected fun <T, D> Call<BiliRespond<T>>.execute(
         onFailure: ((Int, Int, String) -> Unit)?,
-        processingData: (T) -> D
+        processingData: (Response<BiliRespond<T>>, T) -> D
     ): D? = execute(onFailure, true, processingData)
 
     /**
@@ -109,7 +109,7 @@ open class BiliRepository {
         response: Response<BiliRespond<T>>,
         onSuccess: (D) -> Unit,
         onFailure: ((Int, Int, String) -> Unit)?,
-        processingData: (T) -> D,
+        processingData: (Response<BiliRespond<T>>, T) -> D,
         checkResponseCode: Boolean
     ) {
         if (!response.isSuccessful) {
@@ -128,7 +128,9 @@ open class BiliRepository {
             ) ?: throw IllegalStateException(message)
         } else try {
             val body = response.body()!!
-            processingData(body.data ?: body.result!!) ?: throw IllegalStateException("Data null")
+            processingData(
+                response, body.data ?: body.result!!
+            ) ?: throw IllegalStateException("Data null")
         } catch (e: Exception) {
             e.printStackTrace()
             onFailure?.invoke(

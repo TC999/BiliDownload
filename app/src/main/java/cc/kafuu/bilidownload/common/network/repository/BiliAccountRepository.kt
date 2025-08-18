@@ -7,6 +7,8 @@ import cc.kafuu.bilidownload.common.network.model.BiliAccountData
 import cc.kafuu.bilidownload.common.network.model.BiliFavoriteDetailsData
 import cc.kafuu.bilidownload.common.network.model.BiliFavoriteListData
 import cc.kafuu.bilidownload.common.network.model.BiliHistoryData
+import cc.kafuu.bilidownload.common.network.model.BiliQrCodeData
+import cc.kafuu.bilidownload.common.network.model.BiliQrCodePollData
 import cc.kafuu.bilidownload.common.network.model.MyBiliAccountData
 import cc.kafuu.bilidownload.common.network.service.BiliApiService
 import cc.kafuu.bilidownload.common.network.service.BiliPassportService
@@ -32,7 +34,7 @@ class BiliAccountRepository(
             NetworkConfig.buildFullUrl(
                 "/x/space/wbi/acc/info", WbiManager.syncGenerateSignature(params)
             )
-        ).execute(onFailure) { it }
+        ).execute(onFailure) { _, data -> data }
     }
 
     /**
@@ -48,7 +50,7 @@ class BiliAccountRepository(
                     NetworkConfig.buildFullUrl(
                         "/x/space/wbi/acc/info", data
                     )
-                ).enqueue(callback) { it }
+                ).enqueue(callback) { _, data -> data }
             }
 
             override fun onFailure(httpCode: Int, code: Int, message: String) {
@@ -62,7 +64,7 @@ class BiliAccountRepository(
      */
     fun requestMyAccountData(
         callback: IServerCallback<MyBiliAccountData>
-    ) = biliApiService.requestMyAccount().enqueue(callback) { it }
+    ) = biliApiService.requestMyAccount().enqueue(callback) { _, data -> data }
 
     /**
      * 请求获取用户收藏夹
@@ -70,7 +72,7 @@ class BiliAccountRepository(
     fun requestUserFavorites(
         mid: Long, type: Int,
         callback: IServerCallback<BiliFavoriteListData>
-    ) = biliApiService.requestUserFavorites(mid, type).enqueue(callback) { it }
+    ) = biliApiService.requestUserFavorites(mid, type).enqueue(callback) { _, data -> data }
 
     /**
      * 请求获取某个收藏夹详情
@@ -80,7 +82,7 @@ class BiliAccountRepository(
     fun requestFavoriteDetails(
         id: Long, ps: Int, pn: Int,
         callback: IServerCallback<BiliFavoriteDetailsData>
-    ) = biliApiService.requestFavoriteDetails(id, ps, pn).enqueue(callback) { it }
+    ) = biliApiService.requestFavoriteDetails(id, ps, pn).enqueue(callback) { _, data -> data }
 
     /**
      * 同步请求获取某个收藏夹封面图片Url
@@ -88,7 +90,7 @@ class BiliAccountRepository(
     fun syncRequestFavoriteCover(
         id: Long,
         onFailure: ((Int, Int, String) -> Unit)? = null
-    ) = biliApiService.requestFavoriteInfo(id).execute(onFailure) { it.cover }
+    ) = biliApiService.requestFavoriteInfo(id).execute(onFailure) { _, data -> data.cover }
 
     /**
      * 请求获取用户稿件历史记录
@@ -99,13 +101,17 @@ class BiliAccountRepository(
         business: String = "",
         viewAt: Long = 0,
         callback: IServerCallback<BiliHistoryData>
-    ) = biliApiService.requestHistoryCursor(
-        max = max,
-        ps = ps,
-        type = "archive",
-        viewAt = viewAt,
-        business = business
-    ).enqueue(callback) { it }
+    ) {
+        biliApiService
+            .requestHistoryCursor(
+                max = max,
+                ps = ps,
+                type = "archive",
+                viewAt = viewAt,
+                business = business
+            )
+            .enqueue(callback) { _, data -> data }
+    }
 
     /**
      * 账号登出
@@ -113,7 +119,27 @@ class BiliAccountRepository(
     fun requestLogout(
         biliCSRF: String,
         callback: IServerCallback<JsonObject>
-    ) = biliPassportService.requestLogout(
-        biliCSRF
-    ).enqueue(callback) { it }
+    ) {
+        biliPassportService
+            .requestLogout(biliCSRF)
+            .enqueue(callback) { _, data -> data }
+    }
+
+    /**
+     * 请求登录二维码（有效期180s）
+     */
+    fun syncGenerateQrCode(callback: IServerCallback<BiliQrCodeData>) {
+        biliPassportService.generateQrCode().enqueue(callback) { _, data -> data }
+    }
+
+    /**
+     * 轮询验证码状态（如果用户确认登录则回调的二元组中，Second则为Cookies，否则都将为空字符串）
+     */
+    fun pollQrCode(key: String, callback: IServerCallback<Pair<BiliQrCodePollData, String>>) {
+        biliPassportService.pollQrCode(key).enqueue(callback) { response, data ->
+            val rawCookies = response.headers().values("Set-Cookie")
+            val cookies = rawCookies.joinToString("; ") { it.substringBefore(";") }
+            data to cookies
+        }
+    }
 }
