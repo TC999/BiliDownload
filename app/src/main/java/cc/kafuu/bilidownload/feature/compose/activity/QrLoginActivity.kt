@@ -1,5 +1,6 @@
 package cc.kafuu.bilidownload.feature.compose.activity
 
+import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -12,10 +13,14 @@ import cc.kafuu.bilidownload.feature.compose.viewmodel.qrlolgin.QrLoginViewModel
 class QrLoginActivity : CoreCompActivity() {
     private val mViewModel by viewModels<QrLoginViewModel>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mViewModel.emit(QrLoginUiIntent.CreateQr)
+    }
+
     @Composable
     override fun ViewContent() {
         val uiState by mViewModel.uiStateFlow.collectAsState()
         QrLoginLayout(uiState) { mViewModel.emit(it) }
-        mViewModel.emit(QrLoginUiIntent.CreateQr)
     }
 }

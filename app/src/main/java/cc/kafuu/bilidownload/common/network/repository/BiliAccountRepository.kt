@@ -128,7 +128,7 @@ class BiliAccountRepository(
     /**
      * 请求登录二维码（有效期180s）
      */
-    fun syncGenerateQrCode(callback: IServerCallback<BiliQrCodeData>) {
+    fun generateQrCode(callback: IServerCallback<BiliQrCodeData>) {
         biliPassportService.generateQrCode().enqueue(callback) { _, data -> data }
     }
 

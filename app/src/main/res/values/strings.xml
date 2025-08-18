@@ -117,4 +117,10 @@
     <string name="text_clear_data">Clear data</string>
     <string name="tv_clearing_data">Data cleaning…</string>
     <string name="please_login_to_your_account_first">Please login to your account first</string>
+    <string name="qr_login">Qr Login</string>
+    <string name="qr_waiting_scanning_message">Please scan the code</string>
+    <string name="qr_waiting_confirmation_message">Please confirm the login on your phone</string>
+    <string name="qr_completed_message">Please wait...</string>
+    <string name="qr_request_failed_message">Request failed</string>
+
 </resources>
