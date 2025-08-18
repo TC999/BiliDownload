@@ -95,7 +95,7 @@ data class BiliVideoSubtitleItem(
     @SerializedName("lan") val lan: String,
     @SerializedName("lan_doc") val lanDoc: String,
     @SerializedName("is_lock") val isLock: Boolean,
-    @SerializedName("author_mid") val authorMid: Int,
+    @SerializedName("author_mid") val authorMid: Long,
     @SerializedName("subtitle_url") val subtitleUrl: String,
     @SerializedName("author") val author: BiliVideoSubtitleAuthor
 )
