@@ -1,15 +1,18 @@
 package cc.kafuu.bilidownload.common.network
 
 object NetworkConfig {
-    const val BILI_URL = "https://m.bilibili.com"
+    const val BILI_MAIN_URL = "https://bilibili.com"
+    const val BILI_MOBILE_URL = "https://m.bilibili.com"
     const val BILI_API_URL = "https://api.bilibili.com"
     const val BILI_PASSPORT_URL = "https://passport.bilibili.com"
     const val LOGIN_URL = "${BILI_PASSPORT_URL}/h5-app/passport/login"
 
     const val SOURCE_REPOSITORY_URL = "https://github.com/KafuuNeko/BiliDownload"
-    const val OPEN_SOURCE_LICENSES_URL = "https://github.com/KafuuNeko/BiliDownload/blob/master/LICENSE"
+    const val OPEN_SOURCE_LICENSES_URL =
+        "https://github.com/KafuuNeko/BiliDownload/blob/master/LICENSE"
     const val FEEDBACK_URL = "https://github.com/KafuuNeko/BiliDownload/issues"
-    const val GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=cc.kafuu.bilidownload"
+    const val GOOGLE_PLAY_URL =
+        "https://play.google.com/store/apps/details?id=cc.kafuu.bilidownload"
 
 
     val GENERAL_HEADERS = HashMap<String, String>().apply {
@@ -19,8 +22,8 @@ object NetworkConfig {
         )
         put("Accept", "application/json, text/plain, */*")
         put("Accept-Language", "zh-CN,zh-Hans;q=0.9")
-        put("Origin", BILI_URL)
-        put("Referer", BILI_URL)
+        put("Origin", BILI_MOBILE_URL)
+        put("Referer", BILI_MOBILE_URL)
     }
 
     val DOWNLOAD_HEADERS = HashMap<String, String>(GENERAL_HEADERS).apply {

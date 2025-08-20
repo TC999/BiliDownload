@@ -31,7 +31,7 @@ object NetworkManager {
 
     private val biliOriginalContentService: BiliOriginalContentService by lazy {
         createService(
-            NetworkConfig.BILI_URL,
+            NetworkConfig.BILI_MOBILE_URL,
             BiliOriginalContentService::class.java,
             ScalarsConverterFactory.create()
         )

@@ -46,9 +46,10 @@ class BiliInterceptor(
     }
 
     private fun getDefaultCookiesByBili(): String? {
+        // @formatter:off
         if (mCachedCookies == null) {
             val client = OkHttpClient.Builder().build() // 创建一个新的客户端实例
-            val request = Request.Builder().url(NetworkConfig.BILI_URL).apply {
+            val request = Request.Builder().url(NetworkConfig.BILI_MOBILE_URL).apply {
                 NetworkConfig.GENERAL_HEADERS.forEach { (key, value) ->
                     addHeader(key, value)
                 }
@@ -60,9 +61,10 @@ class BiliInterceptor(
                 mCachedCookies = response.headers("Set-Cookie").joinToString("; ")
                 Log.d(TAG, "Refreshed code: ${response.code()} default cookies: $mCachedCookies")
             } catch (e: IOException) {
-                Log.e(TAG, "Failed to fetch cookies from ${NetworkConfig.BILI_URL}", e)
+                Log.e(TAG, "Failed to fetch cookies from ${NetworkConfig.BILI_MOBILE_URL}", e)
             }
         }
+        // @formatter:on
         return mCachedCookies
     }
 

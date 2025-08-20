@@ -7,6 +7,7 @@ sealed class QrLoginUiState {
     data class Normal(
         val userState: QrLoginUserState = QrLoginUserState.QrRequesting,
     ) : QrLoginUiState()
+    data object Finished : QrLoginUiState()
 }
 
 sealed class QrLoginUserState {
@@ -24,6 +25,7 @@ sealed class QrLoginUserState {
      * 等待用户扫码
      */
     data class WaitingScanning(
+        val qrUrl: String,
         val qrBitmap: Bitmap,
         val qrKey: String,
         val createTime: Long = System.currentTimeMillis(),

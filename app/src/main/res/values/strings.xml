@@ -120,7 +120,8 @@
     <string name="qr_login">Qr Login</string>
     <string name="qr_waiting_scanning_message">Please scan the code</string>
     <string name="qr_waiting_confirmation_message">Please confirm the login on your phone</string>
-    <string name="qr_completed_message">Please wait...</string>
-    <string name="qr_request_failed_message">Request failed</string>
-
+    <string name="qr_completed_message">Please wait…</string>
+    <string name="qr_request_failed_message">Request failed. Please click the image to refresh the QR code</string>
+    <string name="qr_waiting_click_link">Or click here</string>
+    <string name="use_account_password_login_hint">Sign in with username and password</string>
 </resources>

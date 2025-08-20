@@ -1,5 +1,7 @@
 package cc.kafuu.bilidownload.common.core.compose
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
@@ -35,11 +37,35 @@ abstract class CoreCompViewModel<I, S>(initStatus: S) : ViewModel() {
     private val mUiIntentObserverMap: MutableMap<KClass<*>, List<KFunction<*>>> = mutableMapOf()
 
     /**
+     * 已注册的Live观察者与Live的关系表
+     */
+    private val _foreverObservers = mutableMapOf<LiveData<*>, MutableSet<Observer<*>>>()
+
+    /**
      * 此构造函数将扫描所有UiIntent观察者并缓存后启动UiIntent收集
      */
     init {
         doCacheUiIntentObservers()
         viewModelScope.launch { mUiIntentFlow.collect { onReceivedUiIntent(it) } }
+    }
+
+    /**
+     * 注册 observeForever 并自动在 onCleared 中移除
+     */
+    protected fun <T> LiveData<T>.observeForeverAutoRemove(observer: Observer<T>) {
+        observeForever(observer)
+        _foreverObservers.getOrPut(this) { mutableSetOf() }.add(observer)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        _foreverObservers.forEach { (liveData, observers) ->
+            @Suppress("UNCHECKED_CAST")
+            observers.forEach { observer ->
+                (liveData as LiveData<Any>).removeObserver(observer as Observer<Any>)
+            }
+        }
+        _foreverObservers.clear()
     }
 
     /**

@@ -56,7 +56,7 @@ class LoginActivity : CoreActivity<ActivityLoginBinding, LoginViewModel>(
         override fun shouldOverrideUrlLoading(
             view: WebView,
             request: WebResourceRequest?
-        ) = CookieManager.getInstance().getCookie("https://bilibili.com").let { cookies ->
+        ) = CookieManager.getInstance().getCookie(NetworkConfig.BILI_MAIN_URL).let { cookies ->
             val requestUrl = request?.url?.host ?: return false
             Log.d(TAG, "shouldOverrideUrlLoading: request: ${requestUrl}, $cookies")
             if (requestUrl == "m.bilibili.com") {

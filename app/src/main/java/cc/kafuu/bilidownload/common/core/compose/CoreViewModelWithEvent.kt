@@ -3,8 +3,7 @@ package cc.kafuu.bilidownload.common.core.compose
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -31,7 +30,7 @@ abstract class CoreCompViewModelWithEvent<I, S, E>(initStatus: S) :
     }
 
     protected suspend fun E.awaitSend() = ViewEventWrapper(this).run {
-        if (!send()) {
+        if (!mUiEventFlow.tryEmit(this)) {
             false
         } else {
             waitForConsumption()
@@ -54,6 +53,7 @@ class ViewEventWrapper<out T>(private val content: T) {
     fun isHandled() = mHasHandled.value
 
     suspend fun waitForConsumption() {
-        mHasHandled.filter { it }.collect()
+        if (mHasHandled.value) return
+        mHasHandled.first { it }
     }
 }

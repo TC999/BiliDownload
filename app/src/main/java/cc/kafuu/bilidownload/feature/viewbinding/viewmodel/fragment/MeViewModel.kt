@@ -21,7 +21,6 @@ class MeViewModel : CoreViewModel() {
 
     fun jumpLoginOrAccount() {
         val accountData = AccountManager.accountLiveData.value ?: kotlin.run {
-            // TODO: 暂时替代为二维码登录
             startActivity(QrLoginActivity::class.java)
             return
         }

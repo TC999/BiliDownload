@@ -117,4 +117,11 @@
     <string name="text_clear_data">清除数据</string>
     <string name="tv_clearing_data">数据清理中…</string>
     <string name="please_login_to_your_account_first">请先登录您的账户</string>
+    <string name="qr_login">二维码登录</string>
+    <string name="qr_waiting_scanning_message">请扫描二维码</string>
+    <string name="qr_waiting_confirmation_message">请在您的手机上确认登录</string>
+    <string name="qr_completed_message">请等待…</string>
+    <string name="qr_request_failed_message">请求失败，请点击图片刷新二维码</string>
+    <string name="qr_waiting_click_link">或者点击此处</string>
+    <string name="use_account_password_login_hint">使用账号或密码登录</string>
 </resources>

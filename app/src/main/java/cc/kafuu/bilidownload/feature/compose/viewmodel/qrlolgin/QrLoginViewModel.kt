@@ -1,11 +1,13 @@
 package cc.kafuu.bilidownload.feature.compose.viewmodel.qrlolgin
 
-import android.util.Log
+import android.webkit.CookieManager
 import androidx.lifecycle.viewModelScope
-import cc.kafuu.bilidownload.common.core.compose.CoreCompViewModel
+import cc.kafuu.bilidownload.common.core.compose.CoreCompViewModelWithEvent
 import cc.kafuu.bilidownload.common.core.compose.UiIntentObserver
 import cc.kafuu.bilidownload.common.jni.QrCodeNativeLib
+import cc.kafuu.bilidownload.common.manager.AccountManager
 import cc.kafuu.bilidownload.common.network.IServerCallback
+import cc.kafuu.bilidownload.common.network.NetworkConfig
 import cc.kafuu.bilidownload.common.network.manager.NetworkManager
 import cc.kafuu.bilidownload.common.network.model.BiliQrCodeData
 import cc.kafuu.bilidownload.common.network.model.BiliQrCodePollData
@@ -16,9 +18,15 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 class QrLoginViewModel :
-    CoreCompViewModel<QrLoginUiIntent, QrLoginUiState>(QrLoginUiState.None) {
+    CoreCompViewModelWithEvent<QrLoginUiIntent, QrLoginUiState, QrLoginUiEvent>(QrLoginUiState.None) {
 
     private var mQrBusinessJob: Job? = null
+
+    init {
+        AccountManager.accountLiveData.observeForeverAutoRemove {
+            if (it != null) QrLoginUiState.Finished.setup()
+        }
+    }
 
     /**
      * 请求二维码
@@ -85,6 +93,7 @@ class QrLoginViewModel :
     private suspend fun doRequestQrCode() {
         val userState = generateQrCode().getOrNull()?.let {
             QrLoginUserState.WaitingScanning(
+                qrUrl = it.url,
                 qrBitmap = QrCodeNativeLib.generateQrBitmap(it.url),
                 qrKey = it.qrcodeKey
             )
@@ -113,8 +122,9 @@ class QrLoginViewModel :
     /**
      * 二维码登录成功
      */
-    private suspend fun doCompleted(cookies: String) {
-        Log.d("TAG", "doCompleted: $cookies")
+    private fun doCompleted(cookies: String) {
+        CookieManager.getInstance().setCookie(NetworkConfig.BILI_MAIN_URL, cookies)
+        AccountManager.updateCookie(cookies)
     }
 
     /**
@@ -139,8 +149,18 @@ class QrLoginViewModel :
 
     @UiIntentObserver(QrLoginUiIntent.TryBack::class)
     fun onTryBack() {
-
+        QrLoginUiState.Finished.setup()
     }
 
+    @UiIntentObserver(QrLoginUiIntent.ClickQrImage::class)
+    fun onClickQrImage() {
+        getOrNull<QrLoginUiState.Normal>()
+            ?.copy(userState = QrLoginUserState.QrRequesting)
+            ?.setup()
+    }
 
+    @UiIntentObserver(QrLoginUiIntent.SwitchToPasswordLogin::class)
+    fun onSwitchToPasswordLogin() = viewModelScope.launch {
+        QrLoginUiEvent.JumpToPasswordLogin.awaitSend()
+    }
 }
